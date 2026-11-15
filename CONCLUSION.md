@@ -22,6 +22,13 @@ whether it changed what the agent *can do* or only what it *admits*. If no layer
 number of correct answers, say so and explain what the layers did change instead.
 
 (write here)
+Layer 1 changed the most. 
+Bare: 16 correct, 4 wrong, 4 no answer.
+After layer 1: 18 correct, 6 wrong, 0 no answer. It changed what the agent can
+do: tool errors go back to the model, so it can try again. q23 and q24 became
+correct, but q21 and q22 became wrong. 
+Layer 2 changed nothing. 
+Layer 3 kept 18 correct and only changed what the agent admits: q18 and q22 went from wrong to no answer.
 
 ## 2. One failure the full harness did not fix
 
@@ -31,6 +38,13 @@ the model do instead? Name one thing you would add to the harness, and what it w
 (extra model calls, tokens, time, or a new way to fail).
 
 (write here)
+q11: which region had the lowest retail trade in 2021. The tool call was
+correct, it only went wrong at the reading step: the list is sorted highest first,
+so the lowest is the last row, but the model answered "Almaty Region". The
+harness only asked for the ANSWER line. Grounding checks only numbers, and a
+region name has no numbers, so it passed obviously. I would add a code check that
+compares the answer with the last row, it will cost one or two extra model calls,
+more tokens and time, and the check itself can make a mistake as well.
 
 ## 3. Workflow or agent for the monthly ranking?
 
@@ -40,6 +54,14 @@ number of model calls, the tokens and the time you measured in Part 1. Then say 
 what kind of question would make you choose the other one.
 
 (write here)
+I would ship the fixed workflow. On the 15 fixed-shape questions it got 13
+correct, 0 wrong, 2 no answer, with 15 model calls, 3852 tokens and 16.0
+seconds. The bare agent got 9 correct, 2 wrong, 4 no answer, with 26 calls,
+19835 tokens and 47.9 seconds. So the workflow is more accurate, about 5 times
+cheaper in tokens and 3 times faster. The agent also got both "lowest"
+questions (q08, q11) wrong. I would choose the agent for a question with an
+unknown shape, like a growth question that needs several tool calls and a
+calculation.
 
 ---
 
